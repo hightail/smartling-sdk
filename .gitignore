@@ -1,6 +1,6 @@
 #Don's commit config changes
-#config/unit.json
-#config/integration.json
+config/unit.json
+config/integration.json
 
 # Intellij
 .idea/

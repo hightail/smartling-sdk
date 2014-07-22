@@ -78,7 +78,7 @@ sdk.rename('some-file', 'some-file-with-a-new-name')
   });
 
 // Delete a file
-sdk.rename('some-file-with-a-new-name')
+sdk.delete('some-file-with-a-new-name')
   .then(function(response) {
     //File deleted successfully
   })
