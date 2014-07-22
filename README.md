@@ -96,6 +96,8 @@ npm test
 ```
 
 ###Integration testing
+Integration tests will run against the real Smartling API.
+
 First you will need to add your apiKey and projectId to ~/test/config/integration.json
 
 ```
