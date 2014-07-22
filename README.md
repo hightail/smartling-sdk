@@ -1,7 +1,7 @@
 smartling-sdk
 ==========================
 
-### NodeJS SDK for Smartling
+# NodeJS SDK for Smartling
 
 Promised based SDK for the [Smartling Translation API](https://docs.smartling.com/display/docs/Smartling+Translation+API)
 
@@ -21,10 +21,13 @@ Install smartling-sdk:
 $ npm install smartling-sdk
 ```
 
-Require it:
+Require and use it:
 
 ```
-var SmartlingSdk = require("../smartling");
+var SmartlingSdk = require("smartling-sdk");
+
+//Create a new sdk object with your Smartling information
+var sdk = new SmartlingSdk(SmartlingSdk.API_BASE_URLS.SANDBOX, 'your-smartling-api-key', 'your-smartling-project-id');
 
 // Get a list of available files
 sdk.list()
@@ -82,5 +85,29 @@ sdk.rename('some-file-with-a-new-name')
   .fail(function(err) {
     //an error has occurred
   });
+```
+
+## How to test smartling-sdk
+
+###Unit testing
+Unit tests run against prerecorded API responses via [node-replay](https://github.com/assaf/node-replay). Unit test configuration is located in ~/test/config/unit.json.
+```
+npm test
+```
+
+###Integration testing
+First you will need to add your apiKey and projectId to ~/test/config/integration.json
+
+```
+{
+  "apiBaseUrl": "https://sandbox-api.smartling.com",
+  "apiKey":     "your-api-key",
+  "projectId":  "your-project-id"
+}
+```
+
+Then you can run the integration script:
+```
+npm run integration
 ```
 
