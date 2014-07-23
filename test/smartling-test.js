@@ -17,7 +17,7 @@ describe('SmartlingSdk', function() {
   });
 
   //Load configuration file
-  var configPath = './smartling-config.json';
+  var configPath = './config/unit.json';
   if (args.config) {
     configPath = args.config;
   }
