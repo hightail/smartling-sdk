@@ -87,10 +87,18 @@ sdk.delete('some-file-with-a-new-name')
   });
 ```
 
+## More documentation
+For more in depth documentation look at the comments in [smartling.js](https://github.com/hightail/smartling-sdk/blob/master/smartling.js)
+
 ## How to test smartling-sdk
 
-###Unit testing
-Unit tests run against prerecorded API responses via [node-replay](https://github.com/assaf/node-replay). Unit test configuration is located in ~/test/config/unit.json.
+###Unit testing & Code coverage
+Unit tests run against prerecorded API responses via [node-replay](https://github.com/assaf/node-replay).
+
+Unit test configuration is located in ~/test/config/unit.json but you don't need to modify it since the responses are prerecorded.
+
+To run the unit tests and code coverage:
+
 ```
 npm test
 ```
@@ -98,7 +106,7 @@ npm test
 ###Integration testing
 Integration tests will run against the real Smartling API.
 
-First you will need to add your apiKey and projectId to ~/test/config/integration.json
+To run the integration tests first you will need to add your *apiKey* and *projectId* to ~/test/config/integration.json
 
 ```
 {
@@ -108,7 +116,7 @@ First you will need to add your apiKey and projectId to ~/test/config/integratio
 }
 ```
 
-Then you can run the integration script:
+Then you can run the script:
 ```
 npm run integration
 ```
