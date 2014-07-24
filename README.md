@@ -1,4 +1,4 @@
-smartling-sdk
+smartling-sdk [![Build Status](https://travis-ci.org/hightail/smartling-sdk.svg?branch=master)](https://travis-ci.org/hightail/smartling-sdk)
 ==========================
 
 # NodeJS SDK for Smartling
