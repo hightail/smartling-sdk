@@ -5,9 +5,6 @@
  *
  * Author: justin.fiedler
  * Date: 1/15/14
- *
- * Improved package.json
- *
  */
 
 
@@ -16,8 +13,15 @@ var fs = require('fs'),
     request = require('request'),
     restler = require('restler'),
     Q = require('q'),
-    url = require('url'),
     _ = require('lodash');
+
+function handleSmartlingResponse(response, deferred) {
+  if (response.response.code === 'SUCCESS') {
+    deferred.resolve(response.response.data);
+  } else {
+    deferred.reject(response);
+  }
+}
 
 /**
  * Initializes Smartling with the given params
@@ -38,11 +42,9 @@ var SmartlingSdk = function (apiBaseUrl, apiKey, projectId) {
  * Smartling API Base URL constants
  */
 SmartlingSdk.API_BASE_URLS = {
-  LIVE: 'https://api.smartling.com',
-  SANDBOX: 'https://sandbox-api.smartling.com'
+  LIVE: 'https://api.smartling.com/v1',
+  SANDBOX: 'https://sandbox-api.smartling.com/v1'
 };
-
-var version = '/v1';
 
 /**
  * Hash of available Smartling operations
@@ -55,10 +57,6 @@ SmartlingSdk.OPERATIONS = {
   RENAME: '/file/rename',
   DELETE: '/file/delete'
 };
-
-_.each(SmartlingSdk.OPERATIONS, function(value, key) {
-  SmartlingSdk.OPERATIONS[key] = version + value;
-});
 
 /**
  * Returns a URL for a Smartling API Operation
@@ -78,7 +76,7 @@ SmartlingSdk.prototype.getSmartlingRequestPath = function(operation, smartlingPa
   _.extend(params, smartlingParams);
 
   //assemble the request URL
-  var requestUrl = url.resolve(this.config.apiBaseUrl, operation);
+  var requestUrl = this.config.apiBaseUrl + operation;
   requestUrl += '?' + querystring.stringify(params);
 
   //console.log('requestUrl', requestUrl);
@@ -141,11 +139,11 @@ SmartlingSdk.prototype.upload = function (filePath, fileUri, fileType, options) 
         data: {
           "file": restler.file(filePath, null, stat.size)
         }
-      }).on('complete', function (result) {
+      }).on('complete', function (result, response) {
         if (result instanceof Error) {
           defered.reject(result);
         } else {
-          defered.resolve(result.response.data);
+          handleSmartlingResponse(result, defered);
         }
       });
     }
@@ -244,11 +242,7 @@ SmartlingSdk.prototype.list = function (options) {
   request.get(requestParams, function (error, response, body) {
 
     if (!error && response.statusCode == 200) {
-      if (body.response.code === 'SUCCESS') {
-        defered.resolve(body.response.data);
-      } else {
-        defered.reject(body);
-      }
+      handleSmartlingResponse(body, defered);
     } else {
       defered.reject(error);
     }
@@ -291,11 +285,7 @@ SmartlingSdk.prototype.status = function (fileUri, locale) {
   //Make the request
   request.get(requestParams, function (error, response, body) {
     if (!error && response.statusCode == 200) {
-      if (body.response.code === 'SUCCESS') {
-        defered.resolve(body.response);
-      } else {
-        defered.reject(body);
-      }
+      handleSmartlingResponse(body, defered);
     } else {
       defered.reject(error);
     }
@@ -333,17 +323,14 @@ SmartlingSdk.prototype.rename = function (fileUri, newFileUri) {
 
   var requestParams = {
     url: requestUrl,
+    body: smartlingParams,
     json: true
   };
 
   //Make the request
   request.post(requestParams, function (error, response, body) {
     if (!error && response.statusCode == 200) {
-      if (body.response.code === 'SUCCESS') {
-        defered.resolve(body.response);
-      } else {
-        defered.reject(body);
-      }
+      handleSmartlingResponse(body, defered);
     } else {
       defered.reject(error);
     }
@@ -378,17 +365,14 @@ SmartlingSdk.prototype.delete = function (fileUri) {
 
   var requestParams = {
     url: requestUrl,
+    body: smartlingParams,
     json: true
   };
 
   //Make the request
   request.del(requestParams, function (error, response, body) {
     if (!error && response.statusCode == 200) {
-      if (body.response.code === 'SUCCESS') {
-        defered.resolve(body.response);
-      } else {
-        defered.reject(body);
-      }
+      handleSmartlingResponse(body, defered);
     } else {
       defered.reject(error);
     }

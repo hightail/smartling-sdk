@@ -110,7 +110,7 @@ To run the integration tests first you will need to add your *apiKey* and *proje
 
 ```
 {
-  "apiBaseUrl": "https://sandbox-api.smartling.com",
+  "apiBaseUrl": "https://sandbox-api.smartling.com/v1",
   "apiKey":     "your-api-key",
   "projectId":  "your-project-id"
 }

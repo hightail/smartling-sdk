@@ -1,0 +1,21 @@
+GET REGEXP /\/v1\/file\/status\?apiKey=.*&projectId=.*&fileUri=translations\.json&locale=.*/
+host: sandbox-api.smartling.com
+accept: application/json
+
+200 HTTP/1.1
+server: nginx
+date: Mon, 28 Jul 2014 20:52:33 GMT
+content-type: application/json;charset=UTF-8
+transfer-encoding: chunked
+connection: keep-alive
+vary: Accept-Encoding
+set-cookie: JSESSIONID=DDCBB2027C35DA4732FDE90CBCF09573; Path=/; Secure; HttpOnly
+access-control-allow-origin: *
+access-control-max-age: 86400
+content-disposition: inline
+pragma: no-cache
+cache-control: no-cache, no-store, max-age=0
+expires: Thu, 01 Jan 1970 00:00:00 GMT
+content-language: en-US
+
+{"response":{"data":{"fileUri":"translations.json","wordCount":0,"fileType":"json","callbackUrl":null,"lastUploaded":"2014-07-28T20:52:32","stringCount":0,"approvedStringCount":0,"completedStringCount":0},"code":"SUCCESS","messages":[]}}

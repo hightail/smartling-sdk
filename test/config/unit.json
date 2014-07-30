@@ -1,5 +1,5 @@
 {
-  "apiBaseUrl": "https://sandbox-api.smartling.com",
+  "apiBaseUrl": "https://sandbox-api.smartling.com/v1",
   "apiKey":     "",
   "projectId":  ""
 }

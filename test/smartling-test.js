@@ -53,32 +53,32 @@ describe('SmartlingSdk', function() {
         done();
       })
       .fail(function(err) {
-        done(err);
+        done(false);
       });
   });
 
   it('should upload a file', function(done){
     sdk.upload(TEST_UPLOAD_JSON_PATH, TEST_UPLOAD_JSON_URI, 'json')
-      .then(function(response) {
-        //console.log('response', response);
-        expect(response.wordCount).to.equal(5);
-        expect(response.stringCount).to.equal(2);
+      .then(function(uploadInfo) {
+        expect(uploadInfo.wordCount).to.equal(5);
+        expect(uploadInfo.stringCount).to.equal(2);
         done();
       })
       .fail(function(err) {
-        done(err);
+        done(false);
       });
   })
 
   it('should get status of a file', function(done){
-    sdk.status(TEST_UPLOAD_JSON_URI)
-      .then(function(response) {
+    sdk.status(TEST_UPLOAD_JSON_URI, 'en')
+      .then(function(statusInfo) {
         //console.log('response', response);
-        expect(response.code).to.equal('SUCCESS');
+        expect(statusInfo.fileUri).to.equal(TEST_UPLOAD_JSON_URI);
+        expect(statusInfo.fileType).to.equal('json');
         done();
       })
       .fail(function(err) {
-        done(err);
+        done(false);
       });
   });
 
@@ -90,31 +90,29 @@ describe('SmartlingSdk', function() {
         done();
       })
       .fail(function(err) {
-        done(err);
+        done(false);
       });
   });
 
   it('should rename a previously uploaded file', function(done){
     sdk.rename(TEST_UPLOAD_JSON_URI, TEST_UPLOAD_JSON_RENAME_URI)
-      .then(function(response) {
-        //console.log('response', response);
-        expect(response.code).to.equal('SUCCESS');
+      .then(function() {
+        //rename returns nothing on success
         done();
       })
       .fail(function(err) {
-        done(err);
+        done(false);
       });
   });
 
   it('should remove a previously uploaded file', function(done){
     sdk.delete(TEST_UPLOAD_JSON_RENAME_URI)
-      .then(function(response) {
-        //console.log('response', response);
-        expect(response.code).to.equal('SUCCESS');
+      .then(function() {
+        //delete returns nothing on success
         done();
       })
       .fail(function(err) {
-        done(err);
+        done(false);
       });
   })
 });

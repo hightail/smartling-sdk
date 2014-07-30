@@ -1,15 +1,17 @@
-GET REGEXP /\/v1\/file\/list\?apiKey=.*/
+DELETE REGEXP /\/v1\/file\/delete\?apiKey=.*&projectId=.*&fileUri=translations-renamed\.json/
 host: sandbox-api.smartling.com
 accept: application/json
+content-type: application/json
+body: {\"fileUri\":\"translations-renamed.json\"}
 
 200 HTTP/1.1
 server: nginx
-date: Fri, 18 Jul 2014 23:51:16 GMT
+date: Mon, 28 Jul 2014 20:52:44 GMT
 content-type: application/json;charset=UTF-8
 transfer-encoding: chunked
 connection: keep-alive
 vary: Accept-Encoding
-set-cookie: JSESSIONID=2D17E46532290D6727E861289E4FD870; Path=/; Secure; HttpOnly
+set-cookie: JSESSIONID=679262825F432297D8330AA1C110B65E; Path=/; Secure; HttpOnly
 access-control-allow-origin: *
 access-control-max-age: 86400
 content-disposition: inline
@@ -18,4 +20,4 @@ cache-control: no-cache, no-store, max-age=0
 expires: Thu, 01 Jan 1970 00:00:00 GMT
 content-language: en-US
 
-{"response":{"data":{"fileList":[],"fileCount":0},"code":"SUCCESS","messages":[]}}
+{"response":{"data":null,"code":"SUCCESS","messages":[]}}

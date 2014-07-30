@@ -4,13 +4,13 @@ accept: application/json
 
 200 HTTP/1.1
 server: nginx
-date: Fri, 18 Jul 2014 23:51:19 GMT
+date: Mon, 28 Jul 2014 20:52:36 GMT
 content-type: application/octet-stream;charset=UTF-8
 content-length: 58
 connection: keep-alive
-set-cookie: JSESSIONID=5E55316CB14C5757361E2B36BDEEB5E5; Path=/; Secure; HttpOnly
-set-cookie: SmartlingSiteId=b47dce2a6; Expires=Sun, 17-Aug-2014 23:51:19 GMT; Path=/; Secure
-set-cookie: SmartlingUserId=b0030266090e8883a24098499597f3ab; Expires=Sun, 17-Aug-2014 23:51:19 GMT; Path=/; Secure
+set-cookie: JSESSIONID=A8934558E587137841A9CA872AD6B712; Path=/; Secure; HttpOnly
+set-cookie: SmartlingSiteId=b47dce2a6; Expires=Wed, 27-Aug-2014 20:52:36 GMT; Path=/; Secure
+set-cookie: SmartlingUserId=b0030266090e8883a24098499597f3ab; Expires=Wed, 27-Aug-2014 20:52:36 GMT; Path=/; Secure
 set-cookie: SmartlingLanguage=en_US; Path=/; Secure
 access-control-allow-origin: *
 access-control-max-age: 86400
