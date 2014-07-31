@@ -1,6 +1,6 @@
 {
   "name": "smartling-sdk",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Javascript SDK for Smartling",
   "main": "smartling.js",
   "config": {
@@ -14,8 +14,8 @@
   "scripts": {
     "test": "npm run unit && npm run ci-coverage",
     "ci-coverage": "mocha -r blanket -R travis-cov",
-    "record-unit": "REPLAY=record mocha ./test/smartling-test.js --config=./config/integration.json",
-    "integration": "REPLAY=bloody mocha ./test/smartling-test.js --config=./config/integration.json",
+    "record-unit": "REPLAY=record mocha ./test/smartling-test.js --config=./config/integration.json --delay=1000",
+    "integration": "REPLAY=bloody mocha ./test/smartling-test.js --config=./config/integration.json --delay=1000",
     "unit": "mocha ./test/smartling-test.js --config=./config/unit.json"
   },
   "repository": {

@@ -21,6 +21,10 @@ describe('SmartlingSdk', function() {
   if (args.config) {
     configPath = args.config;
   }
+  var testDelayMs = 0;
+  if (args.delay) {
+    testDelayMs = parseInt(args.delay);
+  }
 
   var smartlingConfig = require(configPath);
 
@@ -32,16 +36,30 @@ describe('SmartlingSdk', function() {
   var TEST_UPLOAD_JSON_PATH = path.resolve(__dirname, './fixtures/translations.json');
   var TEST_UPLOAD_JSON_URI = 'translations.json';
   var TEST_UPLOAD_JSON_RENAME_URI = 'translations-renamed.json';
+  var BAD_JSON_URI = 'bad-translations.json';
 
   var TEST_UPLOAD_JSON = require(TEST_UPLOAD_JSON_PATH);
 
   //Smartling isnt always fast
-  this.timeout(10000);
+  this.timeout(15000);
 
   beforeEach(function(done){
     sdk = new SmartlingSdk(smartlingConfig.apiBaseUrl, smartlingConfig.apiKey, smartlingConfig.projectId);
 
     done();
+  });
+
+  afterEach(function(done){
+    //For integration testing Smartling will sometimes stop accepting requests if you make too many too fast
+    //setting the --delay option to sometime like 1000 ms will prevent Smartling from crapping out
+    if (testDelayMs > 0) {
+      //console.log('delaying ' + testDelayMs);
+      setTimeout(function() {
+        done();
+      }, testDelayMs);
+    } else {
+      done();
+    }
   });
 
   it('should get a list of files', function(done){
@@ -53,6 +71,7 @@ describe('SmartlingSdk', function() {
         done();
       })
       .fail(function(err) {
+        console.log(err);
         done(false);
       });
   });
@@ -65,6 +84,7 @@ describe('SmartlingSdk', function() {
         done();
       })
       .fail(function(err) {
+        console.log(err);
         done(false);
       });
   })
@@ -78,6 +98,7 @@ describe('SmartlingSdk', function() {
         done();
       })
       .fail(function(err) {
+        console.log(err);
         done(false);
       });
   });
@@ -90,6 +111,7 @@ describe('SmartlingSdk', function() {
         done();
       })
       .fail(function(err) {
+        console.log(err);
         done(false);
       });
   });
@@ -101,6 +123,7 @@ describe('SmartlingSdk', function() {
         done();
       })
       .fail(function(err) {
+        console.log(err);
         done(false);
       });
   });
@@ -112,7 +135,20 @@ describe('SmartlingSdk', function() {
         done();
       })
       .fail(function(err) {
+        console.log(err);
         done(false);
       });
-  })
+  });
+
+  it('should fail to get status of a file that does not exist', function(done){
+    sdk.status(BAD_JSON_URI, 'en')
+      .then(function(statusInfo) {
+        //this call should fail
+        done(false);
+      })
+      .fail(function(error) {
+        expect(error.code).to.equal('VALIDATION_ERROR');
+        done();
+      });
+  });
 });

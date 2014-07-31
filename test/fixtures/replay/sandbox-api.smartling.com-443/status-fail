@@ -1,0 +1,20 @@
+GET REGEXP /\/v1\/file\/status\?apiKey=.*&projectId=.*&fileUri=bad-translations\.json&locale=.*/
+host: sandbox-api.smartling.com
+accept: application/json
+
+400 HTTP/1.1
+server: nginx
+date: Thu, 31 Jul 2014 03:46:09 GMT
+content-type: application/json;charset=UTF-8
+transfer-encoding: chunked
+connection: keep-alive
+set-cookie: JSESSIONID=110405676D457F822D25CF122BFDBAA5; Path=/; Secure; HttpOnly
+access-control-allow-origin: *
+access-control-max-age: 86400
+content-disposition: inline
+pragma: no-cache
+cache-control: no-cache, no-store, max-age=0
+expires: Thu, 01 Jan 1970 00:00:00 GMT
+content-language: en-US
+
+{"response":{"data":null,"code":"VALIDATION_ERROR","messages":["The file \"translations.json\" could not be found"]}}

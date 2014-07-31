@@ -23,6 +23,27 @@ function handleSmartlingResponse(response, deferred) {
   }
 }
 
+function getStandardSmartlingRequestHandler(deferred) {
+  return function (error, response, body) {
+    //console.log(body);
+    if (!error && response.statusCode == 200) {
+      handleSmartlingResponse(body, deferred);
+    } else {
+      var errorObject = {
+        message: "An unknown error occurred"
+      };
+
+      if (body && body.response) {
+        errorObject = body.response;
+      } else if (error) {
+        errorObject = error;
+      }
+
+      deferred.reject(errorObject);
+    }
+  };
+}
+
 /**
  * Initializes Smartling with the given params
  *
@@ -228,7 +249,7 @@ SmartlingSdk.prototype.get = function (fileUri, options) {
  */
 SmartlingSdk.prototype.list = function (options) {
   //create a defered object to return
-  var defered = Q.defer();
+  var deferred = Q.defer();
 
   //assemble the request URL
   var requestUrl = this.getSmartlingRequestPath(SmartlingSdk.OPERATIONS.LIST, options);
@@ -239,17 +260,10 @@ SmartlingSdk.prototype.list = function (options) {
   };
 
   //Make the request
-  request.get(requestParams, function (error, response, body) {
-
-    if (!error && response.statusCode == 200) {
-      handleSmartlingResponse(body, defered);
-    } else {
-      defered.reject(error);
-    }
-  });
+  request.get(requestParams, getStandardSmartlingRequestHandler(deferred));
 
   //return the promise
-  return defered.promise;
+  return deferred.promise;
 };
 
 /**
@@ -266,7 +280,7 @@ SmartlingSdk.prototype.list = function (options) {
  */
 SmartlingSdk.prototype.status = function (fileUri, locale) {
   //create a defered object to return
-  var defered = Q.defer();
+  var deferred = Q.defer();
 
   //setup default request params
   var smartlingParams = {
@@ -283,16 +297,10 @@ SmartlingSdk.prototype.status = function (fileUri, locale) {
   };
 
   //Make the request
-  request.get(requestParams, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      handleSmartlingResponse(body, defered);
-    } else {
-      defered.reject(error);
-    }
-  });
+  request.get(requestParams, getStandardSmartlingRequestHandler(deferred));
 
   //return the promise
-  return defered.promise;
+  return deferred.promise;
 };
 
 /**
@@ -310,7 +318,7 @@ SmartlingSdk.prototype.status = function (fileUri, locale) {
  */
 SmartlingSdk.prototype.rename = function (fileUri, newFileUri) {
   //create a defered object to return
-  var defered = Q.defer();
+  var deferred = Q.defer();
 
   //setup default request params
   var smartlingParams = {
@@ -328,16 +336,10 @@ SmartlingSdk.prototype.rename = function (fileUri, newFileUri) {
   };
 
   //Make the request
-  request.post(requestParams, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      handleSmartlingResponse(body, defered);
-    } else {
-      defered.reject(error);
-    }
-  });
+  request.post(requestParams, getStandardSmartlingRequestHandler(deferred));
 
   //return the promise
-  return defered.promise;
+  return deferred.promise;
 };
 
 /**
@@ -353,7 +355,7 @@ SmartlingSdk.prototype.rename = function (fileUri, newFileUri) {
 SmartlingSdk.prototype.delete = function (fileUri) {
   //console.log('_delete:', fileUri);
   //create a defered object to return
-  var defered = Q.defer();
+  var deferred = Q.defer();
 
   //setup default request params
   var smartlingParams = {
@@ -370,16 +372,10 @@ SmartlingSdk.prototype.delete = function (fileUri) {
   };
 
   //Make the request
-  request.del(requestParams, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      handleSmartlingResponse(body, defered);
-    } else {
-      defered.reject(error);
-    }
-  });
+  request.del(requestParams, getStandardSmartlingRequestHandler(deferred));
 
   //return the promise
-  return defered.promise;
+  return deferred.promise;
 };
 
 //Export the SmartlingSdk Class
