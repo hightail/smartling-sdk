@@ -49,7 +49,7 @@ sdk.upload('./path/to/some-file.json', 'some-file', 'json')
   });
 
 // Get a status of a file
-sdk.status('some-file')
+sdk.status('some-file', 'en')
   .then(function(statusInfo) {
     console.log(statusInfo);
   })

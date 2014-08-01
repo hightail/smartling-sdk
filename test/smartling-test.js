@@ -1,9 +1,11 @@
 'use strict';
 
-var path = require("path"),
-    minimist = require("minimist"),
-    expect = require('chai').expect,
-    Replay = require("replay");
+var path      = require("path"),
+    fs        = require("fs"),
+    minimist  = require("minimist"),
+    expect    = require('chai').expect,
+    Replay    = require("replay"),
+    _         = require("lodash");
 
 //change the fixtures directory
 Replay.fixtures = path.join(__dirname, './fixtures/replay');
@@ -37,11 +39,34 @@ describe('SmartlingSdk', function() {
   var TEST_UPLOAD_JSON_URI = 'translations.json';
   var TEST_UPLOAD_JSON_RENAME_URI = 'translations-renamed.json';
   var BAD_JSON_URI = 'bad-translations.json';
+  var DOWNLOAD_FILE_PATH = path.resolve(__dirname, './download/translations.json');
 
   var TEST_UPLOAD_JSON = require(TEST_UPLOAD_JSON_PATH);
 
   //Smartling isnt always fast
   this.timeout(15000);
+
+  //store a copy of the original Replay headers
+  var origReplayHeaders = _.cloneDeep(Replay.headers);
+
+  /**
+   * Sets Replay.headers to work with POST requests.
+   */
+  function setupReplayHeadersForPOST() {
+    //remove the 'body' and 'content-type' headers from pattern matching since the values
+    //are unique on each POST request and will cause the unit tests to fail
+    Replay.headers = [ /^accept/, /^authorization/, /^host/, /^if-/, /^x-/ ];
+  }
+
+  /**
+   * Restores Replay.headers to the default
+   */
+  function restoreReplayHeaders() {
+    Replay.headers = origReplayHeaders;
+  }
+
+  //TODO: Ideally we shouldnt need to run this globally. See comments in the upload test
+  setupReplayHeadersForPOST();
 
   beforeEach(function(done){
     sdk = new SmartlingSdk(smartlingConfig.apiBaseUrl, smartlingConfig.apiKey, smartlingConfig.projectId);
@@ -77,7 +102,7 @@ describe('SmartlingSdk', function() {
   });
 
   it('should upload a file', function(done){
-    sdk.upload(TEST_UPLOAD_JSON_PATH, TEST_UPLOAD_JSON_URI, 'json')
+   sdk.upload(TEST_UPLOAD_JSON_PATH, TEST_UPLOAD_JSON_URI, 'json')
       .then(function(uploadInfo) {
         expect(uploadInfo.wordCount).to.equal(5);
         expect(uploadInfo.stringCount).to.equal(2);
@@ -90,11 +115,29 @@ describe('SmartlingSdk', function() {
   })
 
   it('should get status of a file', function(done){
+    //TODO: We should setup/teardown the Replay headers for POST here instead of at the top of all the tests
+    //However this causes errors. So I need to do it at the top instead
+    //setupReplayHeadersForPOST();
     sdk.status(TEST_UPLOAD_JSON_URI, 'en')
       .then(function(statusInfo) {
+        //restoreReplayHeaders();
         //console.log('response', response);
         expect(statusInfo.fileUri).to.equal(TEST_UPLOAD_JSON_URI);
         expect(statusInfo.fileType).to.equal('json');
+        done();
+      })
+      .fail(function(err) {
+        //restoreReplayHeaders();
+        console.log(err);
+        done(false);
+      });
+  });
+
+  it('should get a file from Smartling', function(done){
+    sdk.get(TEST_UPLOAD_JSON_URI)
+      .then(function(response) {
+        //console.log('response', response);
+        expect(response).to.deep.equal(TEST_UPLOAD_JSON);
         done();
       })
       .fail(function(err) {
@@ -103,12 +146,24 @@ describe('SmartlingSdk', function() {
       });
   });
 
-  it('should get file from Smartling', function(done){
-    sdk.get(TEST_UPLOAD_JSON_URI)
-      .then(function(response) {
-        //console.log('response', response);
-        expect(response).to.deep.equal(TEST_UPLOAD_JSON);
-        done();
+  it('should download a file from Smartling', function(done){
+    sdk.get(TEST_UPLOAD_JSON_URI, DOWNLOAD_FILE_PATH)
+      .then(function() {
+        fs.exists(DOWNLOAD_FILE_PATH, function(exists) {
+          if (exists) {
+            //make sure the contents match what we uploaded
+            var downloadedFileContents = require(DOWNLOAD_FILE_PATH);
+            expect(downloadedFileContents).to.deep.equal(TEST_UPLOAD_JSON);
+
+            //delete the donwloaded file
+            fs.unlinkSync(DOWNLOAD_FILE_PATH);
+
+            done();
+          } else {
+            //file failed to download
+            done('File failed to save to: ' + DOWNLOAD_FILE_PATH);
+          }
+        })
       })
       .fail(function(err) {
         console.log(err);

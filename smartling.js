@@ -1,23 +1,29 @@
 /**
- * Smartling SDK
+ * smartling-sdk
+ * https://github.com/hightail/smartling-sdk
  *
  * Javascript SDK for Smartling. All functions are promise based using 'q' npm package
  *
- * Author: justin.fiedler
+ * Copyright (c) 2014 Hightail
+ * Author: Justin Fiedler
+ *
  * Date: 1/15/14
  */
 
 
 var fs = require('fs'),
+    path = require('path'),
     querystring = require('querystring'),
+    mkdirp = require('mkdirp'),
     request = require('request'),
-    restler = require('restler'),
     Q = require('q'),
     _ = require('lodash');
 
 function handleSmartlingResponse(response, deferred) {
-  if (response.response.code === 'SUCCESS') {
-    deferred.resolve(response.response.data);
+  var smartlingResponse = response.response;
+  //console.log('smartlingResponse', smartlingResponse);
+  if (smartlingResponse && smartlingResponse.code && smartlingResponse.code === 'SUCCESS') {
+    deferred.resolve(smartlingResponse.data);
   } else {
     deferred.reject(response);
   }
@@ -25,9 +31,14 @@ function handleSmartlingResponse(response, deferred) {
 
 function getStandardSmartlingRequestHandler(deferred) {
   return function (error, response, body) {
-    //console.log(body);
     if (!error && response.statusCode == 200) {
-      handleSmartlingResponse(body, deferred);
+      var data = body;
+      if (_.isString(data)) {
+        try {
+          data = JSON.parse(body);
+        } catch (err) {};
+      }
+      handleSmartlingResponse(data, deferred);
     } else {
       var errorObject = {
         message: "An unknown error occurred"
@@ -135,7 +146,7 @@ SmartlingSdk.prototype.getSmartlingRequestPath = function(operation, smartlingPa
 SmartlingSdk.prototype.upload = function (filePath, fileUri, fileType, options) {
   //console.log('upload:filePath', filePath);
   //create a defered object to return
-  var defered = Q.defer();
+  var deferred = Q.defer();
 
   //setup default request params
   var smartlingParams = {
@@ -153,25 +164,19 @@ SmartlingSdk.prototype.upload = function (filePath, fileUri, fileType, options) 
   fs.stat(filePath, function (err, stat) {
     if (err) {
       //failed to get file stats
-      defered.reject(err);
+      deferred.reject(err);
     } else {
-      restler.post(requestUrl, {
-        multipart: true,
-        data: {
-          "file": restler.file(filePath, null, stat.size)
-        }
-      }).on('complete', function (result, response) {
-        if (result instanceof Error) {
-          defered.reject(result);
-        } else {
-          handleSmartlingResponse(result, defered);
-        }
-      });
+      var req = request.post({
+        url: requestUrl
+      }, getStandardSmartlingRequestHandler(deferred));
+
+      var form = req.form();
+      form.append('file', fs.createReadStream(filePath));
     }
   });
 
   //return the promise
-  return defered.promise;
+  return deferred.promise;
 };
 
 /**
@@ -194,13 +199,13 @@ SmartlingSdk.prototype.upload = function (filePath, fileUri, fileType, options) 
  *
  * @return {promise}
  */
-SmartlingSdk.prototype.get = function (fileUri, options) {
+SmartlingSdk.prototype.get = function (fileUri, filepath, options) {
   //create a defered object to return
   var defered = Q.defer();
 
   //setup default request params
   var smartlingParams = {
-    fileUri: fileUri
+    fileUri: encodeURIComponent(fileUri)
   };
 
   //extend the request params with any options passed in by user
@@ -215,13 +220,40 @@ SmartlingSdk.prototype.get = function (fileUri, options) {
   };
 
   //Make the request
-  request.get(requestParams, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      defered.resolve(body);
-    } else {
-      defered.reject(error);
-    }
-  });
+  if (filepath) {
+    mkdirp(path.dirname(filepath), function(err) {
+      if (err) {
+        console.log(err);
+        defered.reject(err);
+      } else {
+        //create a new writestream for the file
+        var fileStream = fs.createWriteStream(filepath);
+        //handle any error writing to the stream
+        fileStream.on('error', function(err) {
+          defered.reject(error);
+        });
+
+        //create a request and pipe the response to a file
+        var req = request.get(requestParams).pipe(fileStream);
+        req.on('close', function(error) {
+          if (error) {
+            defered.reject(error);
+          } else {
+            defered.resolve();
+          }
+        });
+      }
+    });
+  } else {
+    request.get(requestParams, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        defered.resolve(body);
+      } else {
+        defered.reject(body);
+      }
+    });
+  }
+
 
   //return the promise
   return defered.promise;
