@@ -12,4 +12,4 @@ deploy:
   on:
     tags: true
     repo: hightail/smartling-sdk
-    branch: master
+    all_branches: true
