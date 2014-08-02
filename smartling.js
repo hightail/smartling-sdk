@@ -205,7 +205,7 @@ SmartlingSdk.prototype.get = function (fileUri, filepath, options) {
 
   //setup default request params
   var smartlingParams = {
-    fileUri: encodeURIComponent(fileUri)
+    fileUri: fileUri
   };
 
   //extend the request params with any options passed in by user
