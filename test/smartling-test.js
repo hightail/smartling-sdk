@@ -112,7 +112,24 @@ describe('SmartlingSdk', function() {
         console.log(err);
         done(false);
       });
-  })
+  });
+
+  it('should upload a file with custom options', function(done){
+    sdk.upload(TEST_UPLOAD_JSON_PATH, TEST_UPLOAD_JSON_URI, 'json', {
+        "smartling": {
+          "placeholder_format_custom": "__.+?__"
+        }
+      })
+      .then(function(uploadInfo) {
+        expect(uploadInfo.wordCount).to.equal(5);
+        expect(uploadInfo.stringCount).to.equal(2);
+        done();
+      })
+      .fail(function(err) {
+        console.log(err);
+        done(false);
+      });
+  });
 
   it('should get status of a file', function(done){
     //TODO: We should setup/teardown the Replay headers for POST here instead of at the top of all the tests

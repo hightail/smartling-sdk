@@ -19,6 +19,48 @@ var fs = require('fs'),
     Q = require('q'),
     _ = require('lodash');
 
+
+/**
+ * Returns a search (GET var) string based on the @jsonObject
+ * Handles nested objects using dot notation
+ *
+ * ex:
+ * {
+ *    myParam: 'something',
+ *    myOtherParam: {
+ *      somethingElse: someValue
+ *    }
+ * }
+ *
+ * returns:
+ * myParam=something&myOtherParam.somethingElse=someValue
+ *
+ *
+ * @param jsonObject
+ * @returns {string}
+ */
+var jsonToSearchParameterString = function(jsonObject) {
+  var getParams = [];
+
+
+  function _jsonToSearchParameterString(_jsonObject, prefix) {
+    //loop over all keys in the object
+    _.each(_jsonObject, function(value, key) {
+      if (_.isObject(value)) {
+        //if the value is an object recurse
+        _jsonToSearchParameterString(value, key + '.');
+      } else {
+        //if the value is not an object then add it to the GET params
+        getParams.push(prefix + key + '=' + encodeURIComponent(value));
+      }
+    });
+  }
+
+  _jsonToSearchParameterString(jsonObject, '');
+
+  return getParams.join('&');
+};
+
 function handleSmartlingResponse(response, deferred) {
   var smartlingResponse = response.response;
   //console.log('smartlingResponse', smartlingResponse);
@@ -109,7 +151,7 @@ SmartlingSdk.prototype.getSmartlingRequestPath = function(operation, smartlingPa
 
   //assemble the request URL
   var requestUrl = this.config.apiBaseUrl + operation;
-  requestUrl += '?' + querystring.stringify(params);
+  requestUrl += '?' + jsonToSearchParameterString(params);
 
   //console.log('requestUrl', requestUrl);
 
